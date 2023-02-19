@@ -13,6 +13,7 @@ router.get('/', async (req, res, next) => {
     return next(e);
   }
 })
+
 router.get('/:code', async (req, res, next) => {
   try {
     const { code } = req.params;
@@ -52,11 +53,11 @@ router.put('/:code', async (req, res, next) => {
 
 router.delete('/:code', async (req, res, next) => {
   try {
+    const companies = await db.query('SELECT * FROM companies WHERE code=$1', [req.params.code])
     const results = await db.query(
       'DELETE FROM companies WHERE code=$1', [req.params.code]
     )
-    console.log(results)
-    if (results.rows.length === 0) {
+    if (companies.rows.length === 0) {
       throw new ExpressError(`Can't delete company with code of ${req.params.code}`, 404)
     }
     return res.send({status: "deleted"})
